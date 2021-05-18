@@ -1,70 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-US">
 <head>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <style>
+    /* Create two equal columns that floats next to each other */
+    .column {
+        float: left;
+        padding: 10px;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+      
+    pre {
+  font-size: 12px;
+  border: 2px solid grey;
+  width: 800px;
+  border-left: 12px solid green;
+  border-radius: 5px;
+  padding: 14px;
+              overflow-x: auto;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+}
+</style>
 </head>
 
 <body>
-  <h1>Welcome to WhatIzIt</h1>
-  <h3>Your Images ({{ user_name }})</h3>
-  <table>
-    <tr>
-      <td style="padding:10px">ID</td>
-      <td style="padding:10px">Owner</td>
-      <td style="padding:10px">Upload Time</td>
-      <td style="padding:10px">Preview</td>
-      <td style="padding:10px">Tags</td>
-      <td style="padding:10px">Actions</td>
-    </tr>
-    {% for my_image in my_images %}
-    <tr>
-      <td style="padding:10px">{{ my_image['id'] }}</td>
-      <td style="padding:10px">{{ my_image['owner'] }}</td>
-      <td style="padding:10px">{{ my_image['upload_ts_str'] }}</td>
-      <td style="padding:10px">
-        <a class="preview_link" href="javascript:void(0)"
-          imageurl="https://storage.cloud.google.com/gti-gcp10-whatizit.google.com.a.appspot.com/{{ my_image['id'] }}.jpg">Preview</a>
-      </td>
-      <td style="padding:10px">{{ my_image['tags'] }}</td>
-      <td style="padding:10px">
-        <a id="{{ my_image['id'] }}" class="delete_link" href="javascript:void(0)">
-          delete
-        </a>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-
-  <form method="POST" action="/my_images/post" enctype="multipart/form-data">
-    <p><input type="file" name="file" accept=".jpg"></p>
-    <p><input type="submit" value="Submit"></p>
-  </form>
-
-  <h2>Preview</h2>
+  <h1>GCP Discover Document</h1>
+  <div ng-app="DisDocApp" ng-controller="DisDocController">
+  <div>Discovery Doc URL:</div>
   <div>
-    <img id="pic_preview" src="#" alt="ALT" width="600">
+  <input size="80" placeholder="https://pubsub.googleapis.com/$discovery/rest?version=v1" ng-model="disdocUrl">
+  <button type="button" ng-click="getToc()">GO</button>
+  </div>
+  <h3>RESULT</h3>
+  <div class="row" ng-show="toc != null">
+    <div class="column">
+  <div style="margin-left:20px;">
+  <div>
+      <div><span style="font-weight:900" ng-bind="toc['discovery_doc_url']"></span></div>
+      <div><span style="font-weight:900" ng-bind="toc['service_name']"></span></div>
+      <div><span style="font-weight:900" ng-bind="toc['version']"></span></div>
+      <div><span style="font-weight:900" ng-bind="toc['base_url']"></span></div>
+  </div>
+  <div style="margin-top: 20px;"></div>
+  <div>There are <span style="font-weight:900" ng-bind="toc['api_count']"></span> APIs found.</div>
+  <div ng-repeat="(rsc, apis) in toc['toc']">
+      <div ng-if="apis.length > 0">
+      <div style="margin-left:10px;font-weight:800" ng-bind="rsc"></div>
+      <div ng-repeat="api in apis">
+          <a style="margin-left:50px" ng-bind="api['api_name']" ng-click="showApiInfo(api)"></a>
+      </div>
+      </div>
+  </div>
+  </div>
+    </div>
+    <div class="column">
+        <h3>Action</h3>
+        <pre><code>{{ '{{api_action}}' }}</code></pre>
+        <h3>Scenario</h3>
+        <pre><code>{{ '{{api_scenario}}' }}</code></pre>
+        <h3>Raw Definition</h3>
+        <pre><code>{{ '{{api_def|json}}' }}</code></pre>
+    </div>
+  </div>
+
   </div>
 
   <script>
-    $(document).ready(function () {
-      $("#post_new_image").click(function () {
-        $.post("/my_images/post",
-          function (data, status) {
-            alert("Data: " + data + "\nStatus: " + status);
-          });
-      });
+	var app = angular.module('DisDocApp',[]);
 
-      $(".delete_link").click(function () {
-        image_id = this.id
-        image_delete_url = '/my_images/delete/' + image_id
-        $.post(image_delete_url,
-          function (data, status) {
-            alert("Data: " + data + "\nStatus: " + status);
-          });
-      });
+	app.controller('DisDocController', function($scope, $http){
+      $scope.disdocUrl = "https://pubsub.googleapis.com/$discovery/rest?version=v1"
 
-      $(".preview_link").click(function () {
-        image_url = $(this).attr('imageurl')
-        $("#pic_preview").attr("src", image_url)
-      });
-    });
+      $scope.api_def = {};
+      $scope.api_action = {};
+      $scope.api_scenario = {};
+      
+	  $scope.getToc = function() {
+        dis_doc_url = $scope.disdocUrl
+        toc_url = "/toc?url=" + dis_doc_url
+        $http.get(toc_url).then(
+        function successCallback(response) {
+            $scope.toc = response.data
+            $scope.api_def = {};
+            $scope.api_action = {};
+            $scope.api_scenario = {};
+        },
+        function errorCallback(response) {
+            console.log("ERROR");
+            console.log(response);
+        }
+        );
+      };
+
+      $scope.showApiInfo = function(api_info) {
+        $scope.api_def = angular.fromJson(api_info['definition']);
+        $scope.api_action = api_info['action'];
+        $scope.api_scenario = api_info['scenario'];
+      };
+	});
   </script>
 </body>
+</html>

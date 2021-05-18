@@ -18,19 +18,33 @@ from flask import Flask
 from flask import render_template
 from flask import request
 
+from app.discovery_doc_parser import DiscoveryDocParser
+
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 app = Flask(__name__)
 
 
+@app.route('/')
+def index():
+  return 'Welcome'
+
+
 @app.route('/disdoc')
 def disdoc():
-  return render_template('home.html')
+  return render_template('disdoc.html')
 
+
+@app.route('/toc')
+def toc():
+  dis_doc_url = request.args.get('url', type = str)
+  disdoc = DiscoveryDocParser()
+  toc = disdoc.get_toc(dis_doc_url)
+  return toc
 
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(e):
   return 'Sorry, did not find the page. <br/> - Discovery Doc Parser'
 
 
