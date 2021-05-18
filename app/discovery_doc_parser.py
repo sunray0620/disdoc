@@ -7,7 +7,6 @@ import json
 import os
 
 from app.api_info import ApiInfo
-# import constants
 
 import requests
 
