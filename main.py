@@ -15,6 +15,8 @@
 # [START gae_python38_app]
 # [START gae_python3_app]
 from flask import Flask
+from flask import render_template
+from flask import request
 
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
@@ -22,16 +24,21 @@ from flask import Flask
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello():
-    """Return a friendly HTTP greeting."""
-    return 'Hello World!'
+@app.route('/disdoc')
+def disdoc():
+  return render_template('home.html')
+
+
+@app.errorhandler(404)
+def page_not_found():
+  return 'Sorry, did not find the page. <br/> - Discovery Doc Parser'
 
 
 if __name__ == '__main__':
-    # This is used when running locally only. When deploying to Google App
-    # Engine, a webserver process such as Gunicorn will serve the app. This
-    # can be configured by adding an `entrypoint` to app.yaml.
-    app.run(host='127.0.0.1', port=8080, debug=True)
+  # This is used when running locally only. When deploying to Google App
+  # Engine, a webserver process such as Gunicorn will serve the app. This
+  # can be configured by adding an `entrypoint` to app.yaml.
+  app.run(host='127.0.0.1', port=8080, debug=True)
+
 # [END gae_python3_app]
 # [END gae_python38_app]
