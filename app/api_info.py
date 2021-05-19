@@ -58,7 +58,7 @@ class ApiInfo:
     self.method_url = None
     self.path_params = []
     self.query_params = []
-    self.status = 'AUTOGEN'
+    self.status = 'NORMAL'
 
   def populate_from_method_doc(self, method_doc):
     self.populate_name(method_doc)

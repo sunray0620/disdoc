@@ -16,11 +16,19 @@ Action {action_var_name} = {{
 {action_inputs}
   ]
 
+  outputs = [
+      ### Add output pairs here.
+  ]
+
   http_options = {{
     method = '{http_method}'
     url_path = '{http_url}'
 {http_body}
   }}
+
+  cleanup = [
+    ### Add necessary cleanup invocations here.
+  ]
 }}
 '''
 
@@ -45,6 +53,8 @@ TestScenario {scenario_var_name} = @maf.TestScenario {{
         {{ name = 'projectId', value = '${{outputs.projectId}}' }},
       ]
     }},
+
+    ### Add more necessary setup invocations here.
   ]
 
   api = [
