@@ -49,9 +49,6 @@ class ApiInfo:
     self.version = None
     self.base_url = None
 
-    # Local Info
-    self.config_dir = ''
-
     # API Info
     self.name = None
     self.http_method = None
@@ -168,7 +165,6 @@ class ApiInfo:
         scenario_name=self.name,
         scenario_status=self.status,
 
-        config_dir=self.config_dir,
         scenario_var_name=self.action_id_to_camel(self.name),
         scenario_id=self.generate_action_scenario_name(),
         action_id=self.generate_action_scenario_name(),

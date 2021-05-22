@@ -39,11 +39,9 @@ scenario_template = '''# Discovery Doc: {discovery_doc_url}
 
 import '//configs/api/policy/mafv2/internal/maf.gcl' as maf
 import '//java/com/google/api/policy/mafv2/protos/v2/maf.proto' as proto
-import '//{config_dir}<Your Config Path>/config.gcl' as policy_config
 
 TestScenario {scenario_var_name} = @maf.TestScenario {{
   name = '{scenario_id}'
-  config = policy_config.config
   status = '{scenario_status}'
 
   setup = [
