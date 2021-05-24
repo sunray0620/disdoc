@@ -39,14 +39,15 @@
   <h1>GCP Discover Document</h1>
   <div ng-app="DisDocApp" ng-controller="DisDocController">
     <div>
-      Find your DiscoveryDoc URL from 
+      Find your DiscoveryDoc URL from
       <a href="https://www.googleapis.com/discovery/v1/apis" target="_blank">
         https://www.googleapis.com/discovery/v1/apis
       </a>
     </div>
     <div>Discovery Doc URL:</div>
     <div>
-      <input size="80" placeholder="https://pubsub.googleapis.com/$discovery/rest?version=v1" ng-model="disdocUrl">
+      <input size="80" placeholder="https://pubsub.googleapis.com/$discovery/rest?version=v1" value="{{dis_doc_url}}"
+        ng-model="disdocUrl">
       <button type="button" ng-click="getToc()">GO</button>
     </div>
     <h3>RESULT</h3>
@@ -86,22 +87,25 @@
   <script>
     var app = angular.module('DisDocApp', []);
 
-    app.controller('DisDocController', function ($scope, $http) {
-      $scope.disdocUrl = "https://pubsub.googleapis.com/$discovery/rest?version=v1"
+    app.config(['$locationProvider', function ($locationProvider) {
+      $locationProvider.html5Mode({
+        enabled: true,
+        requireBase: false
+      })
+    }])
 
-      $scope.api_def = {};
-      $scope.api_action = {};
-      $scope.api_scenario = {};
+    app.controller('DisDocController', function ($scope, $http, $location) {
 
       $scope.getToc = function () {
-        dis_doc_url = $scope.disdocUrl
-        toc_url = "/toc?url=" + dis_doc_url
+        dis_doc_url = $scope.disdocUrl;
+        toc_url = "/toc?url=" + dis_doc_url;
         $http.get(toc_url).then(
           function successCallback(response) {
             $scope.toc = response.data
             $scope.api_def = {};
             $scope.api_action = {};
             $scope.api_scenario = {};
+            $location.url("/disdoc?url=" + dis_doc_url);
           },
           function errorCallback(response) {
             console.log("ERROR");
@@ -115,6 +119,18 @@
         $scope.api_action = api_info['action'];
         $scope.api_scenario = api_info['scenario'];
       };
+
+      $scope.api_def = {};
+      $scope.api_action = {};
+      $scope.api_scenario = {};
+
+      $scope.disdocUrl = '{{dis_doc_url}}'
+      console.log($scope.disdocUrl)
+      if ($scope.disdocUrl == 'None') {
+        $scope.disdocUrl = "https://pubsub.googleapis.com/$discovery/rest?version=v1"
+      } else {
+        $scope.getToc();
+      }
     });
   </script>
 </body>

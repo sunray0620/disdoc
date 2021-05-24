@@ -33,7 +33,8 @@ def index():
 
 @app.route('/disdoc')
 def disdoc():
-  return render_template('disdoc.html')
+  dis_doc_url = request.args.get('url', type = str)
+  return render_template('disdoc.html', dis_doc_url=dis_doc_url)
 
 
 @app.route('/toc')
