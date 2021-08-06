@@ -1,8 +1,8 @@
 
-action_template = '''# Discovery Doc: {discovery_doc_url}
-# SERVICE_NAME: [{service_name}]
-# VERSION: [{service_version}]
-# METHOD_NAME: [{action_name}]
+action_template = '''// Discovery Doc: {discovery_doc_url}
+// SERVICE_NAME: [{service_name}]
+// VERSION: [{service_version}]
+// METHOD_NAME: [{action_name}]
 
 import '//configs/api/policy/mafv2/internal/maf.gcl' as maf
 import '//java/com/google/api/policy/mafv2/protos/v2/maf.proto' as proto
@@ -17,7 +17,7 @@ Action {action_var_name} = {{
   ]
 
   outputs = [
-      ### Add output pairs here.
+    // Add output key-values here.
   ]
 
   http_options = {{
@@ -27,22 +27,21 @@ Action {action_var_name} = {{
   }}
 
   cleanup = [
-    ### Add necessary cleanup invocations here.
+    // Add necessary cleanup invocations here.
   ]
 }}
 '''
 
-scenario_template = '''# Discovery Doc: {discovery_doc_url}
-# SERVICE_NAME: [{service_name}]
-# VERSION: [{service_version}]
-# METHOD_ID: [{scenario_name}]
+scenario_template = '''// Discovery Doc: {discovery_doc_url}
+// SERVICE_NAME: [{service_name}]
+// VERSION: [{service_version}]
+// METHOD_ID: [{scenario_name}]
 
 import '//configs/api/policy/mafv2/internal/maf.gcl' as maf
 import '//java/com/google/api/policy/mafv2/protos/v2/maf.proto' as proto
 
 TestScenario {scenario_var_name} = @maf.TestScenario {{
   name = '{scenario_id}'
-  status = '{scenario_status}'
 
   setup = [
     @maf.Invocation {{
@@ -51,8 +50,6 @@ TestScenario {scenario_var_name} = @maf.TestScenario {{
         {{ name = 'projectId', value = '${{outputs.projectId}}' }},
       ]
     }},
-
-    ### Add more necessary setup invocations here.
   ]
 
   api = [
